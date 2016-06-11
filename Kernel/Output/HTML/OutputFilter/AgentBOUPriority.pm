@@ -152,17 +152,20 @@ sub Run {
 		
 		if ( $ConfigObject->Get('AgentBOUPriority::Service') ){
 			
-			my $Services = $Self->_GetServices(
+        my $Services = $Self->_GetServices(
             %GetParam,
-			TicketID => $Self->{TicketID},
-			);
-			
-		    my $SLAs = $Self->_GetSLAs(
+            TicketID => $Self->{TicketID},
+            CustomerUserID => $Ticket{CustomerUserID},
+            QueueID => $Ticket{QueueID},
+        );
+
+            my $SLAs = $Self->_GetSLAs(
 				%GetParam,
-				QueueID      => $Ticket{QueueID},
-				ServiceID      => $Ticket{ServiceID},
-			);
-			
+                QueueID      => $Ticket{QueueID},
+                ServiceID      => $Ticket{ServiceID},
+                CustomerUserID => $Ticket{CustomerUserID},
+            );
+
 		
 			$Data{ServiceSrt} = $LayoutObject->BuildSelection(
 				Data        => $Services,
