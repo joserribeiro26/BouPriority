@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<otrs_config version="1.0" init="Application">
+    <ConfigItem Name="Frontend::Output::FilterElementPost###AgentBOUPriority" Required="0" Valid="1">
+        <Description Translatable="1">Module to show ticket attachments.</Description>
+        <Group>BeOnUP Easy Categorization</Group>
+        <SubGroup>OutputFilter</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::Output::HTML::OutputFilter::AgentBOUPriority</Item>
+                <Item Key="Debug">0</Item>
+                <Item Key="Templates">
+                    <Hash>
+                        <Item Key="AgentTicketZoom">1</Item>
+                    </Hash>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+	
+	<ConfigItem Name="Frontend::Module###AgentBOUPriority" Required="0" Valid="1">
+        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
+        <Group>BeOnUP Easy Categorization</Group>
+        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+    </ConfigItem>
+	
+	    <ConfigItem Name="AgentBOUPriority::Service" Required="1" Valid="1">
+        <Description Translatable="1">Serviço na categorização fácil.</Description>
+        <Group>BeOnUP Easy Categorization</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+	
+		<ConfigItem Name="AgentBOUPriority::Type" Required="1" Valid="1">
+        <Description Translatable="1"> Tipo na categorização fácil</Description>
+        <Group>BeOnUP Easy Categorization</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+	<!--		<ConfigItem Name="AgentBOUPriority::Priority" Required="1" Valid="1"> 
+        <Description Translatable="1"> Tipo na categorização fácil</Description>
+        <Group>BeOnUP Easy Categorization</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem> -->
+	
+</otrs_config>	
