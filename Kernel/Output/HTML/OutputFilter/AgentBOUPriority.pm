@@ -175,7 +175,7 @@ sub Run {
 				Multiple    => 0,
 				TreeView    => 1,
 				Translation => 0,
-				Max         => 200,
+				Max         => 30,
 				Class       => 'Modernize',
 				OnChange	=> "this.form.submit();"
 
@@ -189,7 +189,7 @@ sub Run {
 				Multiple    => 0,
 				TreeView    => 1,
 				Translation => 0,
-				Max         => 200,
+				Max         => 20,
 				Class       => 'Modernize',
 				OnChange	=> "this.form.submit();"
 
