@@ -17,7 +17,7 @@
 
             <input type="hidden" name="Action" value="AgentBOUPriority" />
             <input type="hidden" name="TicketID" value="[% Env("TicketID") %]"/>
-            <div class="Scroller" style="height: 41px; margin-bottom: 1px;">
+				<div class="Scroller" style="height: 41px; margin-bottom: 1px;">
                     [% RenderBlockStart("Type") %]
                         <label class="Mandatory" for="TypeID"><span class="Marker">*</span>[% Translate("Type") | html %]:</label> [% Data.TypeStrg %]
                         <div id="TypeIDError" class="TooltipErrorMessage">
@@ -39,9 +39,8 @@
                         <label for="SLAID">[% Translate("Service Level Agreement") | html %]:</label> [% Data.SLAStrg %]
 
                     [% RenderBlockEnd("SLA") %]
-					
-
-            </div>
+		        </div>
+		</form>
             <div class="Handle ui-resizable-handle ui-resizable-s" style="display: none;">
                 <a href="#">Redimensionar</a>
             </div>

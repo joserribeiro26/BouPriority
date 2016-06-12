@@ -123,32 +123,6 @@ sub Run {
 			);
 		}
 		
-	# if ( $ConfigObject->Get('AgentBOUPriority::Priority') ){
-    # 
-	# 	my $Priorities = $Self->_GetPriorities(
-    #         %GetParam,
-    #     );
-	# 		$Data{PriorityStrg} = $LayoutObject->BuildSelection(
-	# 			Data        => $Priorities,
-	# 			Name        => 'PriorityID',
-	# 			SelectedID  => $Ticket{PriorityID},
-	# 			Size        => 5,
-	# 			Multiple    => 0,
-	# 			TreeView    => 1,
-	# 			Translation => 0,
-	# 			Max         => 200,
-	# 			Class       => 'Modernize',
-	# 			OnChange	=> "this.form.submit();"
-    # 
-	# 		);
-	#         $LayoutObject->Block(
-	# 			Name => 'Priority',
-	# 			Data => {%Data},
-	# 		);
-	# 	
-	# 	
-	# }		
-	
 		
 		if ( $ConfigObject->Get('AgentBOUPriority::Service') ){
 			
@@ -234,7 +208,7 @@ sub _GetNextStates {
     return \%NextStates;
 }
 
-sub _GetResponsible {
+sub _GetResponsible {	
     my ( $Self, %Param ) = @_;
     my %ShownUsers;
     my %AllGroupsMembers = $Kernel::OM->Get('Kernel::System::User')->UserList(
@@ -354,43 +328,6 @@ sub _GetPriorities {
     }
     return \%Priorities;
 }
-
-sub _GetFieldsToUpdate {
-    my ( $Self, %Param ) = @_;
-
-    my @UpdatableFields;
-
-    # set the fields that can be updateable via AJAXUpdate
-    if ( !$Param{OnlyDynamicFields} ) {
-        @UpdatableFields = qw(
-            TypeID ServiceID SLAID NewOwnerID NewResponsibleID NewStateID
-            NewPriorityID
-        );
-    }
-
-    # define the dynamic fields to show based on the object type
-    my $ObjectType = ['Ticket'];
-
-    # get config of frontend module
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get("Ticket::Frontend::$Self->{Action}");
-
-    # only screens that add notes can modify Article dynamic fields
-    if ( $Config->{Note} ) {
-        $ObjectType = [ 'Ticket', 'Article' ];
-    }
-
-    # get the dynamic fields for this screen
-    my $DynamicField = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
-        Valid       => 1,
-        ObjectType  => $ObjectType,
-        FieldFilter => $Config->{DynamicField} || {},
-    );
-
-
-
-    return \@UpdatableFields;
-}
-
 
 sub _GetTypes {
     my ( $Self, %Param ) = @_;
