@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+    <Name>EasyCategorization</Name>
+    <Version>5.0.1</Version>
+    <Framework>5.x</Framework>
+    <Vendor>BeOnUp</Vendor>
+    <URL>http://www.beonup.com.br/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Version="5.0.1" Date="2016-10-24 16:38:00">Added Hungarian translation and code cleanup.</ChangeLog>
+    <ChangeLog Version="5.0.0" Date="2016-02-18 11:18:00">First version.</ChangeLog>
+    <Description Lang="en">Easy to classify your tickets.</Description>
+    <Description Lang="hu">Egyszerűen kategorizálhatóvá teszi a jegyeit.</Description>
+    <Filelist>
+        <File Permission="644" Location="Kernel/Config/Files/EasyCategorization.xml" />
+        <File Permission="644" Location="Kernel/Language/hu_EasyCategorization.pm" />
+        <File Permission="644" Location="Kernel/Language/pt_BR_EasyCategorization.pm" />
+        <File Permission="644" Location="Kernel/Modules/AgentEasyCategorization.pm" />
+        <File Permission="644" Location="Kernel/Output/HTML/OutputFilter/AgentEasyCategorization.pm" />
+        <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AgentEasyCategorization.tt" />
+    </Filelist>
+    <IntroInstall Type="post" Lang="en" Title="Thank you!">
+        Thank you for choosing the BeOnUp EasyCategorization module!
+    </IntroInstall>
+    <IntroInstall Type="post" Lang="hu" Title="Köszönjük!">
+        Köszönjük, hogy a BeOnUp EasyCategorization modulját választotta!
+    </IntroInstall>
+</otrs_package>
