@@ -1,5 +1,12 @@
+# --
+# Copyright (C) 2015-2016 BeOnUp http://www.beonup.com.br
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
 
-package Kernel::Output::HTML::OutputFilter::AgentBOUPriority;
+package Kernel::Output::HTML::OutputFilter::AgentEasyCategorization;
 
 use strict;
 use warnings;
@@ -38,7 +45,7 @@ sub Run {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
     my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
 
-	my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Self->{TicketID},
         DynamicFields => 1,
         UserID        => $Self->{UserID},
@@ -47,8 +54,6 @@ sub Run {
 
     # get config of frontend module
     my $Config = $ConfigObject->Get("Ticket::Frontend::AgentTicketNote");
-
-
 
     # get ACL restrictions
     my %PossibleActions = ( 1 => $Self->{Action} );
@@ -61,6 +66,7 @@ sub Run {
         ReturnSubType => '-',
         UserID        => $Self->{UserID},
     );
+
     my %AclAction = $TicketObject->TicketAclActionData();
 
     my %GetParam;
@@ -74,8 +80,6 @@ sub Run {
     {
         $GetParam{$Key} = $ParamObject->GetParam( Param => $Key );
     }
-
-	
 
     # get dynamic field values form http request
     my %DynamicFieldValues;
@@ -91,107 +95,95 @@ sub Run {
     }
 
     my %DynamicFieldHTML;
-
     my $Output;
-	my %Data;
+    my %Data;
 
-
-		if ( $ConfigObject->Get('AgentBOUPriority::Type') ){
-		
-			my $Types = $Self->_GetTypes(
-				%GetParam,
-				TicketID   =>  $Self->{TicketID},
-				
-			);
-			
-		    $Data{TypeStrg} = $LayoutObject->BuildSelection(
-				Data        => $Types,
-				Name        => 'TypeID',
-				SelectedID  => $Ticket{TypeID},
-				Size        => 5,
-				Multiple    => 0,
-				TreeView    => 1,
-				Translation => 0,
-				Max         => 200,
-				Class       => 'Modernize',
-				OnChange	=> "this.form.submit();"
-
-			);
-	        $LayoutObject->Block(
-				Name => 'Type',
-				Data => {%Data},
-			);
-		}
-		
-		
-		if ( $ConfigObject->Get('AgentBOUPriority::Service') ){
-			
-        my $Services = $Self->_GetServices(
+    if ( $ConfigObject->Get('EasyCategorization::Type') ){
+        my $Types = $Self->_GetTypes(
             %GetParam,
             TicketID => $Self->{TicketID},
-            CustomerUserID => $Ticket{CustomerUserID},
-            QueueID => $Ticket{QueueID},
+        );
+         
+        $Data{TypeStrg} = $LayoutObject->BuildSelection(
+            Data        => $Types,
+            Name        => 'TypeID',
+            SelectedID  => $Ticket{TypeID},
+            Size        => 5,
+            Multiple    => 0,
+            TreeView    => 1,
+            Translation => 0,
+            Max         => 200,
+            Class       => 'Modernize',
+            OnChange    => "this.form.submit();",
         );
 
-            my $SLAs = $Self->_GetSLAs(
-				%GetParam,
-                QueueID      => $Ticket{QueueID},
-                ServiceID      => $Ticket{ServiceID},
-                CustomerUserID => $Ticket{CustomerUserID},
-            );
+        $LayoutObject->Block(
+            Name => 'Type',
+            Data => {%Data},
+        );
+    }
 
-		
-			$Data{ServiceSrt} = $LayoutObject->BuildSelection(
-				Data        => $Services,
-				Name        => 'ServiceID',
-				SelectedID  => $Ticket{ServiceID},
-				Size        => 5,
-				Multiple    => 0,
-				TreeView    => 1,
-				Translation => 0,
-				Max         => 30,
-				Class       => 'Modernize',
-				OnChange	=> "this.form.submit();"
+    if ( $ConfigObject->Get('EasyCategorization::Service') ){
+     
+        my $Services = $Self->_GetServices(
+            %GetParam,
+            TicketID       => $Self->{TicketID},
+            CustomerUserID => $Ticket{CustomerUserID},
+            QueueID        => $Ticket{QueueID},
+        );
+    
+        my $SLAs = $Self->_GetSLAs(
+            %GetParam,
+            QueueID        => $Ticket{QueueID},
+            ServiceID      => $Ticket{ServiceID},
+            CustomerUserID => $Ticket{CustomerUserID},
+        );
+    
+        $Data{ServiceSrt} = $LayoutObject->BuildSelection(
+            Data        => $Services,
+            Name        => 'ServiceID',
+            SelectedID  => $Ticket{ServiceID},
+            Size        => 5,
+            Multiple    => 0,
+            TreeView    => 1,
+            Translation => 0,
+            Max         => 30,
+            Class       => 'Modernize',
+            OnChange    => "this.form.submit();",
+        );
+         
+        $Data{SLAStrg} .= $LayoutObject->BuildSelection(
+            Data        => $SLAs,
+            Name        => 'SLAID',
+            SelectedID  => $Ticket{SLAID},
+            Size        => 5,
+            Multiple    => 0,
+            TreeView    => 1,
+            Translation => 0,
+            Max         => 20,
+            Class       => 'Modernize',
+            OnChange    => "this.form.submit();",
+        );
 
-			);
-			
-			$Data{SLAStrg} .= $LayoutObject->BuildSelection(
-				Data        => $SLAs,
-				Name        => 'SLAID',
-				SelectedID  => $Ticket{SLAID},
-				Size        => 5,
-				Multiple    => 0,
-				TreeView    => 1,
-				Translation => 0,
-				Max         => 20,
-				Class       => 'Modernize',
-				OnChange	=> "this.form.submit();"
+        $LayoutObject->Block(
+            Name => 'Service',
+            Data => {%Data},
+        );
 
-			);
-			
-			$LayoutObject->Block(
-                Name => 'Service',
-                Data => {%Data},
-            );
-			
-			$LayoutObject->Block(
-                Name => 'SLA',
-                Data => {%Data},
-            );
-
-		}
-			
-
-		# 
-		
-		my $iFrame = $LayoutObject->Output(
-    	    TemplateFile => 'AgentBOUPriority',
-	        Data         => \%Data,
-    	); 
-	    ${ $Param{Data} } =~ s{(<div \s+ id="ArticleTree">)}{$iFrame $1}xms;
-		
+        $LayoutObject->Block(
+            Name => 'SLA',
+            Data => {%Data},
+        );
+    }
+     
+     my $iFrame = $LayoutObject->Output(
+         TemplateFile => 'AgentEasyCategorization',
+         Data         => \%Data,
+     ); 
+     ${ $Param{Data} } =~ s{(<div \s+ id="ArticleTree">)}{$iFrame $1}xms;
+        
     return ${ $Param{Data} };
-	
+    
 }
 
 
@@ -208,7 +200,7 @@ sub _GetNextStates {
     return \%NextStates;
 }
 
-sub _GetResponsible {	
+sub _GetResponsible {    
     my ( $Self, %Param ) = @_;
     my %ShownUsers;
     my %AllGroupsMembers = $Kernel::OM->Get('Kernel::System::User')->UserList(
