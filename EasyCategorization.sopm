@@ -2,7 +2,8 @@
 <otrs_package version="1.0">
     <Name>EasyCategorization</Name>
     <Version>5.0.1</Version>
-    <Framework>5.x</Framework>
+    <Framework>5.0.x</Framework>
+    <PackageMerge Name="AgentBOUPriority" TargetVersion="5.0.0" />
     <Vendor>BeOnUp</Vendor>
     <URL>http://www.beonup.com.br/</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
