@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otrs_package version="1.0">
     <Name>EasyCategorization</Name>
-    <Version>5.0.1</Version>
+    <Version>5.0.2</Version>
     <Framework>5.0.x</Framework>
     <PackageMerge Name="AgentBOUPriority" TargetVersion="5.0.0" />
     <Vendor>BeOnUp</Vendor>
     <URL>http://www.beonup.com.br/</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
-    <ChangeLog Version="5.0.1" Date="2016-10-24 16:38:00">Added Hungarian translation and code cleanup.</ChangeLog>
-    <ChangeLog Version="5.0.0" Date="2016-02-18 11:18:00">First version.</ChangeLog>
     <Description Lang="en">Easy to classify your tickets.</Description>
     <Description Lang="hu">Egyszerűen kategorizálhatóvá teszi a jegyeit.</Description>
     <Filelist>

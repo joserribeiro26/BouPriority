@@ -33,7 +33,7 @@ my ( $Type, %Param ) = @_;
     my $Self = {%Param};
     bless( $Self, $Type );
 
-   return $Self;
+    return $Self;
 }
 
 sub Run {
@@ -103,7 +103,7 @@ sub Run {
             %GetParam,
             TicketID => $Self->{TicketID},
         );
-         
+
         $Data{TypeStrg} = $LayoutObject->BuildSelection(
             Data        => $Types,
             Name        => 'TypeID',
@@ -112,7 +112,7 @@ sub Run {
             Multiple    => 0,
             TreeView    => 1,
             Translation => 0,
-            Max         => 200,
+            Max         => 50,
             Class       => 'Modernize',
             OnChange    => "this.form.submit();",
         );
@@ -124,21 +124,21 @@ sub Run {
     }
 
     if ( $ConfigObject->Get('EasyCategorization::Service') ){
-     
+
         my $Services = $Self->_GetServices(
             %GetParam,
             TicketID       => $Self->{TicketID},
             CustomerUserID => $Ticket{CustomerUserID},
             QueueID        => $Ticket{QueueID},
         );
-    
+
         my $SLAs = $Self->_GetSLAs(
             %GetParam,
             QueueID        => $Ticket{QueueID},
             ServiceID      => $Ticket{ServiceID},
             CustomerUserID => $Ticket{CustomerUserID},
         );
-    
+
         $Data{ServiceSrt} = $LayoutObject->BuildSelection(
             Data        => $Services,
             Name        => 'ServiceID',
@@ -147,11 +147,11 @@ sub Run {
             Multiple    => 0,
             TreeView    => 1,
             Translation => 0,
-            Max         => 30,
+            Max         => 50,
             Class       => 'Modernize',
             OnChange    => "this.form.submit();",
         );
-         
+
         $Data{SLAStrg} .= $LayoutObject->BuildSelection(
             Data        => $SLAs,
             Name        => 'SLAID',
@@ -160,7 +160,7 @@ sub Run {
             Multiple    => 0,
             TreeView    => 1,
             Translation => 0,
-            Max         => 20,
+            Max         => 50,
             Class       => 'Modernize',
             OnChange    => "this.form.submit();",
         );
@@ -175,15 +175,39 @@ sub Run {
             Data => {%Data},
         );
     }
-     
-     my $iFrame = $LayoutObject->Output(
-         TemplateFile => 'AgentEasyCategorization',
-         Data         => \%Data,
-     ); 
-     ${ $Param{Data} } =~ s{(<div \s+ id="ArticleTree">)}{$iFrame $1}xms;
-        
+
+    if ( $ConfigObject->Get('EasyCategorization::Priority') ){
+        my $Priorities = $Self->_GetPriorities(
+            %GetParam,
+            TicketID => $Self->{TicketID},
+        );
+
+        $Data{PriorityStrg} = $LayoutObject->BuildSelection(
+            Data        => $Priorities,
+            Name        => 'PriorityID',
+            SelectedID  => $Ticket{PriorityID},
+            Size        => 5,
+            Multiple    => 0,
+            TreeView    => 1,
+            Translation => 1,
+            Max         => 50,
+            Class       => 'Modernize',
+            OnChange    => "this.form.submit();",
+        );
+
+        $LayoutObject->Block(
+            Name => 'Priority',
+            Data => {%Data},
+        );
+    }
+
+    my $iFrame = $LayoutObject->Output(
+        TemplateFile => 'AgentEasyCategorization',
+        Data         => \%Data,
+    );
+    ${ $Param{Data} } =~ s{(<div \s+ id="ArticleTree">)}{$iFrame $1}xms;
+
     return ${ $Param{Data} };
-    
 }
 
 
