@@ -40,7 +40,7 @@ sub Run {
         qw(
         NewStateID NewPriorityID TimeUnits ArticleTypeID Title Body Subject NewQueueID
         Year Month Day Hour Minute NewOwnerID NewResponsibleID TypeID ServiceID SLAID
-        Expand ReplyToArticle StandardTemplateID CreateArticle
+        PriorityID Expand ReplyToArticle StandardTemplateID CreateArticle
         )
         ) {
             $GetParam{$Key} = $ParamObject->GetParam( Param => $Key );
@@ -65,7 +65,7 @@ sub Run {
     );
 
     my $Success4 = $TicketObject->TicketPrioritySet(
-        PriorityID => $GetParam{SLAID},
+        PriorityID => $GetParam{PriorityID},
         TicketID   => $Self->{TicketID},
         UserID     => $Self->{UserID},
     );

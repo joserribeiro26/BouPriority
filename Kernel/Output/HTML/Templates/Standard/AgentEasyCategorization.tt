@@ -41,6 +41,9 @@
                 [% RenderBlockStart("SLA") %]
                     <label for="SLAID">[% Translate("Service Level Agreement") | html %]:</label> [% Data.SLAStrg %]
                 [% RenderBlockEnd("SLA") %]
+                [% RenderBlockStart("Priority") %]
+                    <label for="PriorityID">[% Translate("Priority") | html %]:</label> [% Data.PriorityStrg %]
+                [% RenderBlockEnd("Priority") %]
             </div>
         </form>
         <div class="Handle ui-resizable-handle ui-resizable-s" style="display: none;">
