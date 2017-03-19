@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otrs_package version="1.0">
     <Name>EasyCategorization</Name>
-    <Version>5.0.2</Version>
+	<Version>5.1.2</Version>
     <Framework>5.0.x</Framework>
     <PackageMerge Name="AgentBOUPriority" TargetVersion="5.0.0" />
     <Vendor>BeOnUp</Vendor>
     <URL>http://www.beonup.com.br/</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+	<ChangeLog Version="5.1.2" Date="2017-03-18 13:40:00">Added support to handle ajax requests, code cleanup.</ChangeLog>
+	<Description Lang="pt_BR">Fácil para classificar seus chamados.</Description>
     <Description Lang="en">Easy to classify your tickets.</Description>
     <Description Lang="hu">Egyszerűen kategorizálhatóvá teszi a jegyeit.</Description>
     <Filelist>
         <File Permission="644" Location="Kernel/Config/Files/EasyCategorization.xml" />
         <File Permission="644" Location="Kernel/Language/hu_EasyCategorization.pm" />
         <File Permission="644" Location="Kernel/Language/pt_BR_EasyCategorization.pm" />
-        <File Permission="644" Location="Kernel/Modules/AgentEasyCategorization.pm" />
+        <File Permission="644" Location="Kernel/Modules/EasyCategorizationAJAXHandler.pm" />
+        <File Permission="644" Location="Kernel/System/EasyCategorization.pm" />
         <File Permission="644" Location="Kernel/Output/HTML/OutputFilter/AgentEasyCategorization.pm" />
         <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AgentEasyCategorization.tt" />
+        <File Permission="644" Location="var/httpd/htdocs/js/Core.Agent.EasyCategorization.js"></File>
     </Filelist>
+	<IntroInstall Type="post" Lang="pt_BR" Title="Obrigado!">
+        Obrigado por escolher o módulo EasyCategorization da BeOnUp!
+    </IntroInstall>
     <IntroInstall Type="post" Lang="en" Title="Thank you!">
         Thank you for choosing the BeOnUp EasyCategorization module!
     </IntroInstall>
