@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2015-2016 BeOnUp http://www.beonup.com.br
+# Copyright (C) 2015-2017 BeOnUp http://www.beonup.com.br
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -11,20 +11,7 @@ package Kernel::Output::HTML::OutputFilter::AgentEasyCategorization;
 use strict;
 use warnings;
 
-use List::Util qw(first);
-use Kernel::System::EmailParser;
-use Kernel::System::VariableCheck qw(:all);
-
-our @ObjectDependencies = qw(
-    Kernel::Config
-    Kernel::System::Encode
-    Kernel::System::Log
-    Kernel::System::Main
-    Kernel::System::DB
-    Kernel::System::Time
-    Kernel::System::Web::Request
-    Kernel::Output::HTML::Layout
-);
+our $ObjectManagerDisabled = 1;
 
 sub new {
 my ( $Type, %Param ) = @_;
@@ -44,6 +31,7 @@ sub Run {
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
     my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
+	my $EasyCategorizationObject = $Kernel::OM->Get('Kernel::System::EasyCategorization');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Self->{TicketID},
@@ -52,13 +40,10 @@ sub Run {
         Silent        => 1, 
     );
 
-    # get config of frontend module
-    my $Config = $ConfigObject->Get("Ticket::Frontend::AgentTicketNote");
-
     # get ACL restrictions
     my %PossibleActions = ( 1 => $Self->{Action} );
 
-    my $ACL = $TicketObject->TicketAcl(
+    $TicketObject->TicketAcl(
         Data          => \%PossibleActions,
         Action        => $Self->{Action},
         TicketID      => $Self->{TicketID},
@@ -67,7 +52,7 @@ sub Run {
         UserID        => $Self->{UserID},
     );
 
-    my %AclAction = $TicketObject->TicketAclActionData();
+    $TicketObject->TicketAclActionData();
 
     my %GetParam;
     for my $Key (
@@ -80,28 +65,15 @@ sub Run {
     {
         $GetParam{$Key} = $ParamObject->GetParam( Param => $Key );
     }
-
-    # get dynamic field values form http request
-    my %DynamicFieldValues;
-
-    # to store the reference to the dynamic field for the impact
-
-    # define the dynamic fields to show based on the object type
-    my $ObjectType = ['Ticket'];
-
-    # only screens that add notes can modify Article dynamic fields
-    if ( $Config->{Note} ) {
-        $ObjectType = [ 'Ticket', 'Article' ];
-    }
-
-    my %DynamicFieldHTML;
-    my $Output;
+	
+	# data structure
     my %Data;
 
     if ( $ConfigObject->Get('EasyCategorization::Type') ){
-        my $Types = $Self->_GetTypes(
+        my $Types = $EasyCategorizationObject->GetTypeList(
             %GetParam,
             TicketID => $Self->{TicketID},
+			UserID   => $Self->{UserID}
         );
 
         $Data{TypeStrg} = $LayoutObject->BuildSelection(
@@ -114,7 +86,6 @@ sub Run {
             Translation => 0,
             Max         => 50,
             Class       => 'Modernize',
-            OnChange    => "this.form.submit();",
         );
 
         $LayoutObject->Block(
@@ -125,21 +96,22 @@ sub Run {
 
     if ( $ConfigObject->Get('EasyCategorization::Service') ){
 
-        my $Services = $Self->_GetServices(
+        my $Services = $EasyCategorizationObject->GetServiceList(
             %GetParam,
             TicketID       => $Self->{TicketID},
             CustomerUserID => $Ticket{CustomerUserID},
             QueueID        => $Ticket{QueueID},
+			Action		   => $Self->{Action}
         );
 
-        my $SLAs = $Self->_GetSLAs(
+        my $SLAs = $EasyCategorizationObject->GetSLAList(
             %GetParam,
             QueueID        => $Ticket{QueueID},
             ServiceID      => $Ticket{ServiceID},
-            CustomerUserID => $Ticket{CustomerUserID},
+            CustomerUserID => $Ticket{CustomerUserID}
         );
 
-        $Data{ServiceSrt} = $LayoutObject->BuildSelection(
+        $Data{ServiceSrtg} = $LayoutObject->BuildSelection(
             Data        => $Services,
             Name        => 'ServiceID',
             SelectedID  => $Ticket{ServiceID},
@@ -149,7 +121,6 @@ sub Run {
             Translation => 0,
             Max         => 50,
             Class       => 'Modernize',
-            OnChange    => "this.form.submit();",
         );
 
         $Data{SLAStrg} .= $LayoutObject->BuildSelection(
@@ -162,7 +133,6 @@ sub Run {
             Translation => 0,
             Max         => 50,
             Class       => 'Modernize',
-            OnChange    => "this.form.submit();",
         );
 
         $LayoutObject->Block(
@@ -177,9 +147,11 @@ sub Run {
     }
 
     if ( $ConfigObject->Get('EasyCategorization::Priority') ){
-        my $Priorities = $Self->_GetPriorities(
+        my $Priorities = $EasyCategorizationObject->GetPriorityList(
             %GetParam,
             TicketID => $Self->{TicketID},
+			Action	 => $Self->{Action},
+			UserID   => $Self->{UserID},
         );
 
         $Data{PriorityStrg} = $LayoutObject->BuildSelection(
@@ -192,7 +164,6 @@ sub Run {
             Translation => 1,
             Max         => 50,
             Class       => 'Modernize',
-            OnChange    => "this.form.submit();",
         );
 
         $LayoutObject->Block(
@@ -201,163 +172,103 @@ sub Run {
         );
     }
 
-    my $iFrame = $LayoutObject->Output(
+    my $Frame = $LayoutObject->Output(
         TemplateFile => 'AgentEasyCategorization',
         Data         => \%Data,
     );
-    ${ $Param{Data} } =~ s{(<div \s+ id="ArticleTree">)}{$iFrame $1}xms;
+    ${ $Param{Data} } =~ s{(<div \s+ id="ArticleTree">)}{$Frame $1}xms;
+	
+	#Load JS time execution
+	my $ZoomFrontendConfiguration = $ConfigObject->Get('Frontend::Module')->{AgentTicketZoom};
+    my @CustomJSFiles = ('Core.Agent.EasyCategorization.js');
+    push( @{ $ZoomFrontendConfiguration->{Loader}->{JavaScript} || [] }, @CustomJSFiles );
+	
+    # add js function to TypeID
+	my $JSBlock = <<"JS_TYPE_BLOCK";
+\$("#TypeID").bind('change', function () {
+	\$("#AJAXLoaderTypeID").css("display","");
+	
+	// Update Type and load Services data
+    Core.Agent.EasyCategorization.TypeUpdate($Self->{TicketID});
+});
+JS_TYPE_BLOCK
+	
+	# add js function to ServiceID
+	$JSBlock .= <<"JS_SERVICE_BLOCK";
+\$("#ServiceID").bind('change', function () {
+	\$("#AJAXLoaderServiceID").css("display","");
+	
+	// Update service and load SLA data based
+    Core.Agent.EasyCategorization.ServiceUpdate($Self->{TicketID});
+});
+JS_SERVICE_BLOCK
+
+	# add js function to SLAID
+	$JSBlock .= <<"JS_SLA_BLOCK";
+\$("#SLAID").bind('change', function () {
+	\$("#AJAXLoaderSLAID").css("display","");
+
+	// Set value to SLA
+    Core.Agent.EasyCategorization.SLAUpdate($Self->{TicketID});
+});
+JS_SLA_BLOCK
+
+	# add js function to PriorityID
+	$JSBlock .= <<"JS_PRIORITY_BLOCK";
+\$("#PriorityID").bind('change', function () {
+	\$("#AJAXLoaderPriorityID").css("display","");
+	
+	// Set value to Priority
+    Core.Agent.EasyCategorization.PriorityUpdate($Self->{TicketID});
+});
+JS_PRIORITY_BLOCK
+
+    $Self->AddJSOnDocumentCompleteIfNotExists(
+        Key  => 'EasyCategorization',
+        Code => $JSBlock,
+    );
 
     return ${ $Param{Data} };
 }
 
+# --
+# Function based on module Znuny4OTRS-Repo from Znuny
+# --
 
-sub _GetNextStates {
+sub AddJSOnDocumentCompleteIfNotExists {
     my ( $Self, %Param ) = @_;
 
-    my %NextStates = $Kernel::OM->Get('Kernel::System::Ticket')->TicketStateList(
-        TicketID => $Self->{TicketID},
-        Action   => $Self->{Action},
-        UserID   => $Self->{UserID},
-        %Param,
+    # check needed stuff
+    NEEDED:
+    for my $Needed (qw(Key Code)) {
+
+        next NEEDED if defined $Param{$Needed};
+
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Parameter '$Needed' is needed!",
+        );
+        return;
+    }
+
+    my $Exists = 0;
+    CODEJS:
+    for my $CodeJS ( @{ $Kernel::OM->Get('Kernel::Output::HTML::Layout')->{_JSOnDocumentComplete} || [] } ) {
+
+        next CODEJS if $CodeJS !~ m{ Key: \s $Param{Key}}xms;
+        $Exists = 1;
+        last CODEJS;
+    }
+
+    return 1 if $Exists;
+
+    my $AddCode = "// Key: $Param{Key}\n" . $Param{Code}."\n";
+
+    $Kernel::OM->Get('Kernel::Output::HTML::Layout')->AddJSOnDocumentComplete(
+        Code => $AddCode,
     );
 
-    return \%NextStates;
-}
-
-sub _GetResponsible {    
-    my ( $Self, %Param ) = @_;
-    my %ShownUsers;
-    my %AllGroupsMembers = $Kernel::OM->Get('Kernel::System::User')->UserList(
-        Type  => 'Long',
-        Valid => 1,
-    );
-
-    # show all users
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('Ticket::ChangeOwnerToEveryone') ) {
-        %ShownUsers = %AllGroupsMembers;
-    }
-
-    # show only users with responsible or rw pemissions in the queue
-    elsif ( $Param{QueueID} && !$Param{AllUsers} ) {
-        my $GID = $Kernel::OM->Get('Kernel::System::Queue')->GetQueueGroupID(
-            QueueID => $Param{NewQueueID} || $Param{QueueID}
-        );
-        my %MemberList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupGet(
-            GroupID => $GID,
-            Type    => 'responsible',
-        );
-        for my $UserID ( sort keys %MemberList ) {
-            $ShownUsers{$UserID} = $AllGroupsMembers{$UserID};
-        }
-    }
-
-    # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-
-    # workflow
-    my $ACL = $TicketObject->TicketAcl(
-        %Param,
-        Action        => $Self->{Action},
-        ReturnType    => 'Ticket',
-        ReturnSubType => 'Responsible',
-        Data          => \%ShownUsers,
-        UserID        => $Self->{UserID},
-    );
-
-    return { $TicketObject->TicketAclData() } if $ACL;
-
-    return \%ShownUsers;
-}
-
-sub _GetServices {
-    my ( $Self, %Param ) = @_;
-
-    # get service
-    my %Service;
-
-    # get options for default services for unknown customers
-    my $DefaultServiceUnknownCustomer
-        = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Service::Default::UnknownCustomer');
-
-    # check if no CustomerUserID is selected
-    # if $DefaultServiceUnknownCustomer = 0 leave CustomerUserID empty, it will not get any services
-    # if $DefaultServiceUnknownCustomer = 1 set CustomerUserID to get default services
-    if ( !$Param{CustomerUserID} && $DefaultServiceUnknownCustomer ) {
-        $Param{CustomerUserID} = '<DEFAULT>';
-    }
-
-    # get service list
-    if ( $Param{CustomerUserID} ) {
-        %Service = $Kernel::OM->Get('Kernel::System::Ticket')->TicketServiceList(
-            %Param,
-            Action => $Self->{Action},
-            UserID => $Self->{UserID},
-        );
-    }
-    return \%Service;
-}
-
-sub _GetSLAs {
-    my ( $Self, %Param ) = @_;
-
-    # if non set customers can get default services then they should also be able to get the SLAs
-    #  for those services (this works during ticket creation).
-    # if no CustomerUserID is set, TicketSLAList will complain during AJAX updates as UserID is not
-    #  passed. See bug 11147.
-
-    # get options for default services for unknown customers
-    my $DefaultServiceUnknownCustomer
-        = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Service::Default::UnknownCustomer');
-
-    # check if no CustomerUserID is selected
-    # if $DefaultServiceUnknownCustomer = 0 leave CustomerUserID empty, it will not get any services
-    # if $DefaultServiceUnknownCustomer = 1 set CustomerUserID to get default services
-    if ( !$Param{CustomerUserID} && $DefaultServiceUnknownCustomer ) {
-        $Param{CustomerUserID} = '<DEFAULT>';
-    }
-
-    my %SLA;
-    if ( $Param{ServiceID} ) {
-        %SLA = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSLAList(
-            %Param,
-            Action => $Self->{Action},
-        );
-    }
-    return \%SLA;
-}
-
-sub _GetPriorities {
-    my ( $Self, %Param ) = @_;
-
-    my %Priorities = $Kernel::OM->Get('Kernel::System::Ticket')->TicketPriorityList(
-        %Param,
-        Action   => $Self->{Action},
-        UserID   => $Self->{UserID},
-        TicketID => $Self->{TicketID},
-    );
-
-    # get config of frontend module
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get("Ticket::Frontend::$Self->{Action}");
-
-    if ( !$Config->{PriorityDefault} ) {
-        $Priorities{''} = '-';
-    }
-    return \%Priorities;
-}
-
-sub _GetTypes {
-    my ( $Self, %Param ) = @_;
-
-    # get type
-    my %Type;
-    if ( $Param{QueueID} || $Param{TicketID} ) {
-        %Type = $Kernel::OM->Get('Kernel::System::Ticket')->TicketTypeList(
-            %Param,
-            Action => $Self->{Action},
-            UserID => $Self->{UserID},
-        );
-    }
-    return \%Type;
+    return 1;
 }
 
 1;
