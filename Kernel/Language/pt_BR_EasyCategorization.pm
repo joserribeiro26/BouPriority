@@ -1,6 +1,6 @@
 # --
 # Kernel/Language/pt_BR_EasyCategorization.pm - the Portuguese translation for EasyCategorization
-# Copyright (C) 2015-2016 BeOnUp http://www.beonup.com.br
+# Copyright (C) 2015-2017 BeOnUp http://www.beonup.com.br
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -27,6 +27,9 @@ sub Data {
     $Lang->{'Easy categorization for the service.'} = 'Serviço na categorização fácil.';
     $Lang->{'Easy categorization for the type.'} = 'Tipo na categorização fácil.';
     $Lang->{'Easy categorization for the priority.'} = 'Prioridade na categorização fácil.';
+    $Lang->{'Frontend module registration for the agent interface.'} = '';
+    $Lang->{'To perform easy categorization with AJAX-request.'} = '';
+    $Lang->{'EasyCategorization AJAX'} = '';
 
     return 1;
 }

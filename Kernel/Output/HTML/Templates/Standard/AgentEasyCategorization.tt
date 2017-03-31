@@ -9,27 +9,35 @@
 <div class="WidgetSimple SpacingTop Expanded">
     <div class="Header">
         <div class="WidgetAction Toggle">
-            <a href="#" title="[% Translate("Toggle this widget") | html %]"><i class="fa fa-caret-right"></i><i class="fa fa-caret-down"></i></a>
+            <a href="#" title="[% Translate("Show or hide the content") | html %]"><i class="fa fa-caret-right"></i><i class="fa fa-caret-down"></i></a>
         </div>
         <h2>[% Translate("Easy Categorization") | html %]</h2>
     </div>
     <div class="Content">
-		<fieldset class="TableLike">            
+        <fieldset class="TableLike">
             <div class="Field" style="margin-left: 0%;">
-				<label for="TypeID">[% Translate("Type") | html %]:</label>
-				[% Data.TypeStrg %]
-				<span id="AJAXLoaderTypeID" class="AJAXLoader" style="display: none;"></span>
-				<label for="ServiceID">[% Translate("Service") | html %]:</label>
-				[% Data.ServiceSrtg %]
-				<span id="AJAXLoaderServiceID" class="AJAXLoader" style="display: none;"></span>
-				<label for="SLAID">[% Translate("SLA") | html %]:</label>
-				[% Data.SLAStrg %]
-				<span id="AJAXLoaderSLAID" class="AJAXLoader" style="display: none;"></span>
-				<label for="PriorityID">[% Translate("Priority") | html %]:</label>
-				[% Data.PriorityStrg %]
-				<span id="AJAXLoaderPriorityID" class="AJAXLoader" style="display: none;"></span>
+[% RenderBlockStart("Type") %]
+                <label for="TypeID">[% Translate("Type") | html %]:</label>
+                [% Data.TypeStrg %]
+                <span id="AJAXLoaderTypeID" class="AJAXLoader" style="display: none;"></span>
+[% RenderBlockEnd("Type") %]
+[% RenderBlockStart("Service") %]
+                <label for="ServiceID">[% Translate("Service") | html %]:</label>
+                [% Data.ServiceSrtg %]
+                <span id="AJAXLoaderServiceID" class="AJAXLoader" style="display: none;"></span>
+[% RenderBlockEnd("Service") %]
+[% RenderBlockStart("SLA") %]
+                <label for="SLAID">[% Translate("SLA") | html %]:</label>
+                [% Data.SLAStrg %]
+                <span id="AJAXLoaderSLAID" class="AJAXLoader" style="display: none;"></span>
+[% RenderBlockEnd("SLA") %]
+[% RenderBlockStart("Priority") %]
+                <label for="PriorityID">[% Translate("Priority") | html %]:</label>
+                [% Data.PriorityStrg %]
+                <span id="AJAXLoaderPriorityID" class="AJAXLoader" style="display: none;"></span>
+[% RenderBlockEnd("Priority") %]
             </div>
             <div class="Clear"></div>
-		</fieldset>
-	</div>
+        </fieldset>
+    </div>
 </div>

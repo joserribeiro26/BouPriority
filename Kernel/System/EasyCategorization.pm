@@ -17,7 +17,7 @@ use warnings;
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Ticket',
-	'Ticket::Service::Default::UnknownCustomer'
+    'Ticket::Service::Default::UnknownCustomer'
 );
 
 sub new {
@@ -49,10 +49,10 @@ sub GetServiceList {
     if ( $Param{CustomerUserID} && $Param{Action} ) {
         %Service = $Kernel::OM->Get('Kernel::System::Ticket')->TicketServiceList(
             %Param,
-			Action => $Param{Action} || 'AgentTicketZoom',
+            Action => $Param{Action} || 'AgentTicketZoom',
         );
     }
-	
+
     return \%Service;
 }
 
@@ -99,14 +99,14 @@ sub GetTypeList {
 
 sub GetPriorityList {
     my ( $Self, %Param ) = @_;
-	
-	my %Priorities;
-	if ( $Param{Action} || $Param{TicketID} ) {
+
+    my %Priorities;
+    if ( $Param{Action} || $Param{TicketID} ) {
         %Priorities = $Kernel::OM->Get('Kernel::System::Ticket')->TicketPriorityList(
-			%Param,
-			Action   => $Param{Action},
-			TicketID => $Param{TicketID},
-		);
+            %Param,
+            Action   => $Param{Action},
+            TicketID => $Param{TicketID},
+        );
     }
 
     # get config of frontend module
@@ -117,6 +117,5 @@ sub GetPriorityList {
     }
     return \%Priorities;
 }
-
 
 1;
