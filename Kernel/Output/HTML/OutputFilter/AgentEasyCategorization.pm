@@ -27,17 +27,17 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
-	my $EasyCategorizationObject = $Kernel::OM->Get('Kernel::System::EasyCategorization');
+    my $LayoutObject             = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $TicketObject             = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $ConfigObject             = $Kernel::OM->Get('Kernel::Config');
+    my $ParamObject              = $Kernel::OM->Get('Kernel::System::Web::Request');
+    my $EasyCategorizationObject = $Kernel::OM->Get('Kernel::System::EasyCategorization');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Self->{TicketID},
         DynamicFields => 1,
         UserID        => $Self->{UserID},
-        Silent        => 1, 
+        Silent        => 1,
     );
 
     # get ACL restrictions
@@ -65,15 +65,15 @@ sub Run {
     {
         $GetParam{$Key} = $ParamObject->GetParam( Param => $Key );
     }
-	
-	# data structure
+
+    # data structure
     my %Data;
 
     if ( $ConfigObject->Get('EasyCategorization::Type') ){
         my $Types = $EasyCategorizationObject->GetTypeList(
             %GetParam,
             TicketID => $Self->{TicketID},
-			UserID   => $Self->{UserID}
+            UserID   => $Self->{UserID},
         );
 
         $Data{TypeStrg} = $LayoutObject->BuildSelection(
@@ -101,14 +101,14 @@ sub Run {
             TicketID       => $Self->{TicketID},
             CustomerUserID => $Ticket{CustomerUserID},
             QueueID        => $Ticket{QueueID},
-			Action		   => $Self->{Action}
+            Action         => $Self->{Action},
         );
 
         my $SLAs = $EasyCategorizationObject->GetSLAList(
             %GetParam,
             QueueID        => $Ticket{QueueID},
             ServiceID      => $Ticket{ServiceID},
-            CustomerUserID => $Ticket{CustomerUserID}
+            CustomerUserID => $Ticket{CustomerUserID},
         );
 
         $Data{ServiceSrtg} = $LayoutObject->BuildSelection(
@@ -150,8 +150,8 @@ sub Run {
         my $Priorities = $EasyCategorizationObject->GetPriorityList(
             %GetParam,
             TicketID => $Self->{TicketID},
-			Action	 => $Self->{Action},
-			UserID   => $Self->{UserID},
+            Action   => $Self->{Action},
+            UserID   => $Self->{UserID},
         );
 
         $Data{PriorityStrg} = $LayoutObject->BuildSelection(
@@ -177,48 +177,48 @@ sub Run {
         Data         => \%Data,
     );
     ${ $Param{Data} } =~ s{(<div \s+ id="ArticleTree">)}{$Frame $1}xms;
-	
-	#Load JS time execution
-	my $ZoomFrontendConfiguration = $ConfigObject->Get('Frontend::Module')->{AgentTicketZoom};
+
+    #Load JS time execution
+    my $ZoomFrontendConfiguration = $ConfigObject->Get('Frontend::Module')->{AgentTicketZoom};
     my @CustomJSFiles = ('Core.Agent.EasyCategorization.js');
     push( @{ $ZoomFrontendConfiguration->{Loader}->{JavaScript} || [] }, @CustomJSFiles );
-	
+
     # add js function to TypeID
-	my $JSBlock = <<"JS_TYPE_BLOCK";
+    my $JSBlock = <<"JS_TYPE_BLOCK";
 \$("#TypeID").bind('change', function () {
-	\$("#AJAXLoaderTypeID").css("display","");
-	
-	// Update Type and load Services data
+    \$("#AJAXLoaderTypeID").css("display","");
+
+    // Update Type and load Services data
     Core.Agent.EasyCategorization.TypeUpdate($Self->{TicketID});
 });
 JS_TYPE_BLOCK
-	
-	# add js function to ServiceID
-	$JSBlock .= <<"JS_SERVICE_BLOCK";
+
+    # add js function to ServiceID
+    $JSBlock .= <<"JS_SERVICE_BLOCK";
 \$("#ServiceID").bind('change', function () {
-	\$("#AJAXLoaderServiceID").css("display","");
-	
-	// Update service and load SLA data based
+    \$("#AJAXLoaderServiceID").css("display","");
+
+    // Update service and load SLA data based
     Core.Agent.EasyCategorization.ServiceUpdate($Self->{TicketID});
 });
 JS_SERVICE_BLOCK
 
-	# add js function to SLAID
-	$JSBlock .= <<"JS_SLA_BLOCK";
+    # add js function to SLAID
+    $JSBlock .= <<"JS_SLA_BLOCK";
 \$("#SLAID").bind('change', function () {
-	\$("#AJAXLoaderSLAID").css("display","");
+    \$("#AJAXLoaderSLAID").css("display","");
 
-	// Set value to SLA
+    // Set value to SLA
     Core.Agent.EasyCategorization.SLAUpdate($Self->{TicketID});
 });
 JS_SLA_BLOCK
 
-	# add js function to PriorityID
-	$JSBlock .= <<"JS_PRIORITY_BLOCK";
+    # add js function to PriorityID
+    $JSBlock .= <<"JS_PRIORITY_BLOCK";
 \$("#PriorityID").bind('change', function () {
-	\$("#AJAXLoaderPriorityID").css("display","");
-	
-	// Set value to Priority
+    \$("#AJAXLoaderPriorityID").css("display","");
+
+    // Set value to Priority
     Core.Agent.EasyCategorization.PriorityUpdate($Self->{TicketID});
 });
 JS_PRIORITY_BLOCK
